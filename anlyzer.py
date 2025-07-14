@@ -18,10 +18,9 @@ def is_rate_limit_exceeded(ip_data: dict, threshold: int = 100,  window_sec: int
     recent_requests = [t for t in ip_data["request_times"] if now - t <= timedelta(seconds=window_sec)]
     return len(recent_requests) >= max_requests
 
-def analyze_by_risk_score(ip_data_action: str) -> str:
-    if ip_data_action == "block":
-        return "high"
-    elif ip_data_action == "review":
-        return "medium"
-    else:
-        return "low"
+def calculate_risk_score():
+    pass
+
+
+def evaluate_action():
+    pass
