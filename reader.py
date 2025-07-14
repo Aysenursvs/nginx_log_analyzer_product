@@ -13,7 +13,7 @@ def read_static_log_file(file_path):
             for line in file:
                 yield line
     except FileNotFoundError:
-        return f"Error: The file {file_path} does not exist."
+        raise FileNotFoundError(f"Error: The file {file_path} does not exist.")
     except Exception as e:
-        return f"An error occurred while reading the file: {e}"
+        raise Exception(f"An error occurred while reading the file: {e}")
 
