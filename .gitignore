@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Log dosyaları
+*.log
+logs/
+nginx-access-example.log
+
+# Virtual environment
+venv/
+.env
+
+# IDE/editor dosyaları
+.vscode/
+.idea/
