@@ -14,7 +14,9 @@ def update_ip_record(parsed_line, ip_datas):
             "status_codes": {parsed_line.get("status"): 1},
             "is_bot": False,
             "is_suspicious": False,
-            "last_seen": parsed_line.get("datetime")
+            "last_seen": parsed_line.get("datetime"),
+            "risk_score": 0,
+            "action": "normal"
         }
     else:
         ip_datas[ip]["request_times"].append(parsed_line.get("datetime"))
@@ -26,12 +28,26 @@ def update_ip_record(parsed_line, ip_datas):
     return ip_datas[ip]
 
 def update_bot_status(ip_data, bot_status):
+    if not ip_data["is_bot"] and bot_status:
+        ip_data["risk_score"] += 50
     ip_data["is_bot"] = bot_status
     ip_data["is_suspicious"] = bot_status
+    
 
 def update_suspicious_status(ip_data, suspicious_status):
-    ip_data["is_suspicious"] = suspicious_status
-    
+    if not ip_data["is_bot"]:
+        if not ip_data["is_suspicious"] and suspicious_status:
+            ip_data["risk_score"] += 20
+        ip_data["is_suspicious"] = suspicious_status
+
+
+def update_action_by_risk_score(ip_data: dict) -> str:
+    if ip_data["risk_score"] >= 70:
+        ip_data["action"] = "block"
+    elif ip_data["risk_score"] >= 40:
+        ip_data["action"] = "review"
+    else:
+        ip_data["action"] = "normal"
 
 
 
@@ -48,5 +64,9 @@ def print_record(ip_datas):
         print(f"  Is Bot: {data['is_bot']}")
         print(f"  Is Suspicious: {data['is_suspicious']}")
         print(f"  Last Seen: {data['last_seen']}\n")
+        print(f"  Risk Score: {data['risk_score']}")
+        print(f"  Action: {data['action']}")
+        
+        
         print("-" * 40)
         print()
