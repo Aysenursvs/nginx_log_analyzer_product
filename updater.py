@@ -28,7 +28,15 @@ def update_ip_record(parsed_line, ip_datas):
 def update_bot_status(ip_data, bot_status):
     ip_data["is_bot"] = bot_status
     ip_data["is_suspicious"] = bot_status
+
+def update_suspicious_status(ip_data, suspicious_status):
+    ip_data["is_suspicious"] = suspicious_status
     
+
+
+
+
+
 
 def print_record(ip_datas):
     for ip, data in ip_datas.items():
