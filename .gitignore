@@ -15,3 +15,6 @@ venv/
 # IDE/editor dosyaları
 .vscode/
 .idea/
+
+# json files
+ip_datas.json/
