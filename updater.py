@@ -19,14 +19,17 @@ def update_ip_record(parsed_line, ip_datas):
             "request_count": 1,
             "status_codes": {parsed_line.get("status"): 1},
             "is_bot": False,
-            "updated_bot_status": False,
             "is_suspicious": False,
-            "updated_suspicious_status": False,
             "is_limit_exceeded": False,
-            "updated_rate_limit_status": False,
             "last_seen": parsed_line.get("datetime_obj"),
             #"country": get_geolocation(ip).get("country"),
             #"city": get_geolocation(ip).get("city"),
+            "risk_components": {
+                "bot": 0,
+                "suspicious": 0,
+                "rate_limit": 0
+            },
+
             "risk_score": 0,
             "action": "normal"
         }
@@ -99,8 +102,12 @@ def print_record(ip_datas):
         print(f"  Is Suspicious: {data['is_suspicious']}")
         print(f"  Is Rate Limit Exceeded: {data['is_limit_exceeded']}")
         print(f"  Last Seen: {data['last_seen']}\n")
-        print(f"  Country: {data['country']}")
-        print(f"  City: {data['city']}")
+        #print(f"  Country: {data['country']}")
+        #print(f"  City: {data['city']}")
+        print(f"  Risk Components:")
+        print(f"    Bot: {data['risk_components']['bot']}")
+        print(f"    Suspicious: {data['risk_components']['suspicious']}")
+        print(f"    Rate Limit: {data['risk_components']['rate_limit']}")
         print(f"  Risk Score: {data['risk_score']}")
         print(f"  Action: {data['action']}")
         

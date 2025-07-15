@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 
 log_file_path = '/home/aysenur/projects/nginx_analyzer/nginx.vhost.access.log'
+log_file_path2 = '/home/aysenur/projects/nginx_analyzer/nginx-access-example.log'
 ip_datas = {}
 
 # Get total number of lines for progress bar
