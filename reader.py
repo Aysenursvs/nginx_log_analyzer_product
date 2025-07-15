@@ -1,4 +1,21 @@
 
+import time
+
+def follow_log_file(file_path):
+    """
+    Continuously yields new lines as they are added to the file.
+    Like `tail -f`.
+    """
+    with open(file_path, "r") as f:
+        f.seek(0, 2)  # Go to end of file
+        while True:
+            line = f.readline()
+            if not line:
+                time.sleep(0.5)
+                continue
+            yield line
+
+
 #Read static log file
 
 def read_static_log_file(file_path):
