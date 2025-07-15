@@ -19,3 +19,6 @@ venv/
 
 # json files
 ip_datas.json
+
+# ignored files
+location.py 

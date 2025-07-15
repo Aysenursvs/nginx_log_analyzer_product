@@ -1,6 +1,7 @@
 from anlayzer import is_bot_by_user_agent, check_request_count, is_rate_limit_exceeded, calculate_risk_score
 from variables import bot_risk_score, suspicious_risk_score, rate_limit_risk_score, block_risk_score, review_risk_score, request_count_threshold,  rate_limit_window_sec, max_requests
 from datetime import datetime
+import geocoder
            
 
 def update_ip_record(parsed_line, ip_datas):
@@ -21,6 +22,8 @@ def update_ip_record(parsed_line, ip_datas):
             "is_suspicious": False,
             "is_limit_exceeded": False,
             "last_seen": parsed_line.get("datetime_obj"),
+            "country": get_geolocation(ip).get("country"),
+            "city": get_geolocation(ip).get("city"),
             "risk_score": 0,
             "action": "normal"
         }
@@ -32,6 +35,14 @@ def update_ip_record(parsed_line, ip_datas):
         ip_datas[ip]["last_seen"] = parsed_line.get("datetime_obj")
 
     return ip_datas[ip]
+
+def get_geolocation(ip):
+    g = geocoder.ip(ip)
+    return {
+        "city": g.city,
+        "country": g.country,
+        "latlng": g.latlng
+    }
 
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:
@@ -82,6 +93,8 @@ def print_record(ip_datas):
         print(f"  Is Suspicious: {data['is_suspicious']}")
         print(f"  Is Rate Limit Exceeded: {data['is_limit_exceeded']}")
         print(f"  Last Seen: {data['last_seen']}\n")
+        print(f"  Country: {data['country']}")
+        print(f"  City: {data['city']}")
         print(f"  Risk Score: {data['risk_score']}")
         print(f"  Action: {data['action']}")
         
