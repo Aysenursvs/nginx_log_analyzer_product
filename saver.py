@@ -38,3 +38,6 @@ def save_bad_lines_to_file(bad_lines):
     with open("bad_log_lines.txt", "w") as f:
         f.writelines(bad_lines)
 
+def save_ip_location_cache(cache, file_path="ip_location_cache.json"):
+    with open(file_path, "w") as f:
+        json.dump(cache, f, indent=4)

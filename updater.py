@@ -4,7 +4,7 @@ from datetime import datetime
 import geocoder
            
 
-def update_ip_record(parsed_line, ip_datas):
+def update_ip_record(parsed_line, ip_datas, cache):
     """
     Updates the IP data record with the parsed log line information.
     
@@ -22,8 +22,8 @@ def update_ip_record(parsed_line, ip_datas):
             "is_suspicious": False,
             "is_limit_exceeded": False,
             "last_seen": parsed_line.get("datetime_obj"),
-            #"country": get_geolocation(ip).get("country"),
-            #"city": get_geolocation(ip).get("city"),
+            #"country": get_geolocation(ip, cache).get("country"),
+            #"city": get_geolocation(ip, cache).get("city"),
             "risk_components": {
                 "bot": 0,
                 "suspicious": 0,
@@ -31,7 +31,9 @@ def update_ip_record(parsed_line, ip_datas):
             },
 
             "risk_score": 0,
-            "action": "normal"
+            "action": "normal",
+            "review_warning": False,
+            "block_warning": False
         }
     else:
         ip_datas[ip]["request_times"].append(parsed_line.get("datetime_obj"))
@@ -42,13 +44,21 @@ def update_ip_record(parsed_line, ip_datas):
 
     return ip_datas[ip]
 
-def get_geolocation(ip):
+
+
+def get_geolocation(ip, cache):
+    if ip in cache:
+        return cache[ip]
+
     g = geocoder.ip(ip)
-    return {
+    location = {
         "city": g.city,
         "country": g.country,
         "latlng": g.latlng
     }
+    cache[ip] = location
+    return location
+
 
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:

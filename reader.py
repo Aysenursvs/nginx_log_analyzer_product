@@ -1,5 +1,7 @@
 
 import time
+import json
+import os
 
 def follow_log_file(file_path):
     """
@@ -33,4 +35,11 @@ def read_static_log_file(file_path):
         raise FileNotFoundError(f"Error: The file {file_path} does not exist.")
     except Exception as e:
         raise Exception(f"An error occurred while reading the file: {e}")
+    
+
+def load_ip_location_cache(file_path="ip_location_cache.json"):
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            return json.load(f)
+    return {}
 

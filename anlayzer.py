@@ -19,6 +19,8 @@ def is_rate_limit_exceeded(ip_data: dict, window_sec: int = 60, max_requests: in
     recent_requests = [t for t in ip_data["request_times"] if now - t <= timedelta(seconds=window_sec)]
     return len(recent_requests) >= max_requests
 
+# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+######   Eklenen Risk Skorlar değişiklik gösterebilir ya da bir değişkene atanıp o değişken değerleri kullanılabilir.
 def calculate_bot_risk(ip_data):
     known_safe_bots = ["googlebot", "bingbot", "yandexbot", "baiduspider"]
     suspicious_agents = ["python", "curl", "wget", "requests", "scrapy", "aiohttp"]

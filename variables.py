@@ -9,7 +9,7 @@ review_risk_score = 40
 
 ### for analyzer functions
 ## check_request_count
-request_count_threshold = 10000
+request_count_threshold = 19
 
 ##is_rate_limit_exceeded 
 rate_limit_threshold = 100
