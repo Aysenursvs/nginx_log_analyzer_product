@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 
 def parse_log_line(line):
@@ -14,17 +15,27 @@ def parse_log_line(line):
         if not match:
             return None
         ip = match.group(1)
-        datetime = match.group(2).split(' ')[0]
+        datetime_str = match.group(2).split(' ')[0]
         utc = match.group(2).split(' ')[1] if ' ' in match.group(2) else ''
         request = match.group(3)
         status = match.group(4)
         size = match.group(5)
         referer = match.group(6)
         user_agent = match.group(7)
+
+        dt_obj = None
+        try:
+            dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S %z")  # offset'li dene
+        except ValueError:
+            try:
+                dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S")  # offset'siz dene
+            except ValueError:
+                return None
         
         return {
             "ip": ip,
-            "datetime": datetime,
+            "datetime": datetime_str,
+            "datetime_obj": dt_obj,
             "utc": utc,
             "request": request,
             "status": status,

@@ -1,7 +1,7 @@
 from reader import read_static_log_file
 from parser import parse_log_line
 from updater import update_ip_record, print_record, update_ip_status
-from anlyzer import is_bot_by_user_agent, check_request_count
+from anlayzer import is_bot_by_user_agent, check_request_count
 
 
 log_lines = read_static_log_file('/home/aysenur/projects/nginx_analyzer/nginx-access-example.log')
