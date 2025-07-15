@@ -1,4 +1,4 @@
-from anlayzer import is_bot_by_user_agent, check_request_count, is_rate_limit_exceeded
+from anlayzer import is_bot_by_user_agent, check_request_count, is_rate_limit_exceeded, calculate_risk_score
 from variables import bot_risk_score, suspicious_risk_score, rate_limit_risk_score, block_risk_score, review_risk_score, request_count_threshold,  rate_limit_window_sec, max_requests
 from datetime import datetime
            
@@ -35,17 +35,17 @@ def update_ip_record(parsed_line, ip_datas):
 
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:
-        ip_data["risk_score"] += bot_risk_score
-    ip_data["is_bot"] = bot_status
-    ip_data["is_suspicious"] = bot_status
+        ip_data["is_bot"] = bot_status
+        ip_data["is_suspicious"] = bot_status
     
 
 def update_suspicious_status(ip_data, suspicious_status):
     if not ip_data["is_bot"]:
-        if not ip_data["is_suspicious"] and suspicious_status:
-            ip_data["risk_score"] += suspicious_risk_score
         ip_data["is_suspicious"] = suspicious_status
 
+def update_rate_limit_status(ip_data, rate_limit_status):
+    if not ip_data["is_limit_exceeded"] and rate_limit_status:
+        ip_data["is_limit_exceeded"] = rate_limit_status
 
 def update_action_by_risk_score(ip_data: dict) -> str:
     if ip_data["risk_score"] >= block_risk_score:
@@ -55,10 +55,7 @@ def update_action_by_risk_score(ip_data: dict) -> str:
     else:
         ip_data["action"] = "normal"
 
-def update_rate_limit_status(ip_data, rate_limit_status):
-    if not ip_data["is_limit_exceeded"] and rate_limit_status:
-        ip_data["risk_score"] += rate_limit_risk_score
-    ip_data["is_limit_exceeded"] = rate_limit_status
+
 
 
 
@@ -69,6 +66,7 @@ def update_ip_status(ip_data):
     update_suspicious_status(ip_data, suspicious_status)
     rate_limit_status = is_rate_limit_exceeded(ip_data,  rate_limit_window_sec, max_requests)
     update_rate_limit_status(ip_data, rate_limit_status)
+    calculate_risk_score(ip_data)
     
     update_action_by_risk_score(ip_data)
 
