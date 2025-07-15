@@ -1,3 +1,5 @@
+from anlyzer import is_bot_by_user_agent, check_request_count
+
 def update_ip_record(parsed_line, ip_datas):
     """
     Updates the IP data record with the parsed log line information.
@@ -51,7 +53,12 @@ def update_action_by_risk_score(ip_data: dict) -> str:
 
 
 
-
+def update_ip_status(ip_data):
+    bot_status = is_bot_by_user_agent(ip_data["user_agents"])
+    update_bot_status(ip_data, bot_status)
+    suspicious_status = check_request_count(ip_data, 19)
+    update_suspicious_status(ip_data, suspicious_status)
+    update_action_by_risk_score(ip_data)
 
 
 def print_record(ip_datas):
