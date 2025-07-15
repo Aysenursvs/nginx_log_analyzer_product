@@ -17,4 +17,4 @@ venv/
 .idea/
 
 # json files
-ip_datas.json/
+ip_datas.json
