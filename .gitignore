@@ -18,7 +18,8 @@ venv/
 .idea/
 
 # json files
-ip_datas.json
+*.json
 
 # ignored files
 location.py 
+problems.txt

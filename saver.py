@@ -1,4 +1,5 @@
 import json
+import os
 
 def save_ip_data_to_file(file_path, ip_datas):
     try:
@@ -6,3 +7,21 @@ def save_ip_data_to_file(file_path, ip_datas):
             json.dump(ip_datas, f, default=str, indent=4)
     except Exception as e:
         print(f"Error while saving data: {e}")
+
+def save_single_ip_data(file_path, ip, ip_data):
+    # Dosya varsa oku, yoksa boş dict başlat
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = {}
+    else:
+        data = {}
+
+    # IP verisini güncelle
+    data[ip] = ip_data
+
+    # Dosyaya tekrar yaz
+    with open(file_path, 'w') as f:
+        json.dump(data, f, default=str, indent=4)
