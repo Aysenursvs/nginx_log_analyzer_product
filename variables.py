@@ -7,9 +7,9 @@ rate_limit_risk_score = 20
 block_risk_score = 70
 review_risk_score = 40
 
-### for anlayzer functions
+### for analyzer functions
 ## check_request_count
-request_count_threshold = 19
+request_count_threshold = 10000
 
 ##is_rate_limit_exceeded 
 rate_limit_threshold = 100

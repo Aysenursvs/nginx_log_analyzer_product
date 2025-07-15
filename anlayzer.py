@@ -11,7 +11,7 @@ def is_bot_by_user_agent(user_agents: list[str]) -> bool:
                 return True
     return False
 
-def check_request_count(ip_data: dict, threshold: int = 100) -> bool:
+def check_request_count(ip_data: dict, threshold: int = 10000) -> bool:
     return ip_data.get("request_count", 0) > threshold
 
 def is_rate_limit_exceeded(ip_data: dict, window_sec: int = 60, max_requests: int = 100) -> bool:
@@ -20,11 +20,14 @@ def is_rate_limit_exceeded(ip_data: dict, window_sec: int = 60, max_requests: in
     return len(recent_requests) >= max_requests
 
 def calculate_risk_score(ip_data: dict):
-    if ip_data["is_bot"]:
+    if ip_data["is_bot"] and not ip_data["updated_bot_status"]:
         ip_data["risk_score"] += bot_risk_score
-    if ip_data["is_suspicious"]:
+        ip_data["updated_bot_status"] = True
+    if ip_data["is_suspicious"] and not ip_data["updated_suspicious_status"]:
         ip_data["risk_score"] += suspicious_risk_score
-    if ip_data["is_limit_exceeded"]:
+        ip_data["updated_suspicious_status"] = True
+    if ip_data["is_limit_exceeded"] and not ip_data["updated_rate_limit_status"]:
         ip_data["risk_score"] += rate_limit_risk_score
+        ip_data["updated_rate_limit_status"] = True
 
 

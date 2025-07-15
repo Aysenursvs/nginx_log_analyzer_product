@@ -25,3 +25,16 @@ def save_single_ip_data(file_path, ip, ip_data):
     # Dosyaya tekrar yaz
     with open(file_path, 'w') as f:
         json.dump(data, f, default=str, indent=4)
+
+def save_bad_lines_to_file(bad_lines):
+    """
+    Saves bad log lines to a file for later review.
+    
+    :param bad_lines: List of bad log lines
+    """
+    if not bad_lines:
+        return
+    
+    with open("bad_log_lines.txt", "w") as f:
+        f.writelines(bad_lines)
+

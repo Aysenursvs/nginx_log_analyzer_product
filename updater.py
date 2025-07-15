@@ -19,11 +19,14 @@ def update_ip_record(parsed_line, ip_datas):
             "request_count": 1,
             "status_codes": {parsed_line.get("status"): 1},
             "is_bot": False,
+            "updated_bot_status": False,
             "is_suspicious": False,
+            "updated_suspicious_status": False,
             "is_limit_exceeded": False,
+            "updated_rate_limit_status": False,
             "last_seen": parsed_line.get("datetime_obj"),
-            "country": get_geolocation(ip).get("country"),
-            "city": get_geolocation(ip).get("city"),
+            #"country": get_geolocation(ip).get("country"),
+            #"city": get_geolocation(ip).get("city"),
             "risk_score": 0,
             "action": "normal"
         }
@@ -47,16 +50,19 @@ def get_geolocation(ip):
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:
         ip_data["is_bot"] = bot_status
-        ip_data["is_suspicious"] = bot_status
+        
+        
     
 
 def update_suspicious_status(ip_data, suspicious_status):
-    if not ip_data["is_bot"]:
+    if not ip_data["is_suspicious"] and suspicious_status:
         ip_data["is_suspicious"] = suspicious_status
+        
 
 def update_rate_limit_status(ip_data, rate_limit_status):
     if not ip_data["is_limit_exceeded"] and rate_limit_status:
         ip_data["is_limit_exceeded"] = rate_limit_status
+        
 
 def update_action_by_risk_score(ip_data: dict) -> str:
     if ip_data["risk_score"] >= block_risk_score:
