@@ -5,11 +5,14 @@ import os
 
 def follow_log_file(file_path):
     """
-    Continuously yields new lines as they are added to the file.
-    Like `tail -f`.
+    Yields all existing lines in the file, then continuously yields new lines as they are added.
+    Like `tail -f` but includes initial content.
     """
     with open(file_path, "r") as f:
-        f.seek(0, 2)  # Go to end of file
+        # İlk olarak dosyada var olan tüm satırları oku
+        for line in f:
+            yield line
+        # Sonra yeni satır geldikçe oku
         while True:
             line = f.readline()
             if not line:
@@ -36,6 +39,10 @@ def read_static_log_file(file_path):
     except Exception as e:
         raise Exception(f"An error occurred while reading the file: {e}")
     
+def total_lines_in_file(file_path):
+    with open(file_path, 'r') as f:
+        total_lines = sum(1 for _ in f)
+    return total_lines
 
 def load_ip_location_cache(file_path="ip_location_cache.json"):
     if os.path.exists(file_path):
