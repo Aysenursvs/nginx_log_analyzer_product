@@ -21,24 +21,53 @@ def is_rate_limit_exceeded(ip_data: dict, window_sec: int = 60, max_requests: in
 
 # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ######   Eklenen Risk Skorlar değişiklik gösterebilir ya da bir değişkene atanıp o değişken değerleri kullanılabilir.
+def is_unknown_or_weird_user_agent(ua: str) -> bool:
+    ua = ua.strip()
+    if ua == "" or ua == "-":
+        return True
+    if len(ua) < 10:
+        return True
+    if not any(c.isalpha() for c in ua):  # hiç harf içermiyorsa
+        return True
+    return False
+
 def calculate_bot_risk(ip_data):
     known_safe_bots = ["googlebot", "bingbot", "yandexbot", "baiduspider"]
     suspicious_agents = ["python", "curl", "wget", "requests", "scrapy", "aiohttp"]
 
     user_agents = ip_data.get("user_agents", [])
     risk = 0
+    has_tool = False
+    has_unknown_bot = False
+    has_safe_bot = False
+    has_weird_ua = False
 
     for ua in user_agents:
         ua_lower = ua.lower()
 
         if any(bot in ua_lower for bot in known_safe_bots):
-            risk += 10  # tanınan bot → düşük risk
+            has_safe_bot = True
         elif any(tool in ua_lower for tool in suspicious_agents):
-            risk += 40  # tool ile gelen → yüksek risk
+            has_tool = True
         elif "bot" in ua_lower or "spider" in ua_lower or "crawl" in ua_lower:
-            risk += 25  # bot ama türü bilinmiyor → orta risk
+            has_unknown_bot = True
+        elif is_unknown_or_weird_user_agent(ua_lower):
+            has_weird_ua = True
+
+    if has_tool:
+        risk += 40
+    if has_unknown_bot:
+        risk += 25
+    if has_safe_bot:
+        risk += 10
+    if has_weird_ua:
+        risk += 20
+    if len(user_agents) > 10:
+        risk += 15  # Çok fazla çeşitlilik
 
     return risk
+
+
 
 
 def calculate_suspicious_risk_by_request_count(ip_data) -> int:
@@ -62,7 +91,7 @@ def calculate_rate_limit_risk(ip_data) -> int:
         return 30
     return 0
 
-def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=10, high_risk_score=30):
+def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=500, high_risk_score=10):
     prefix = prefix_counter.get(ip_data.get("prefix"), None)
     if prefix  > prefix_threshold:
         return high_risk_score
