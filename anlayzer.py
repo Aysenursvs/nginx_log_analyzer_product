@@ -62,9 +62,9 @@ def calculate_rate_limit_risk(ip_data) -> int:
         return 30
     return 0
 
-def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=100, high_risk_score=30):
-    prefix = ip_data.get("prefix")
-    if prefix and prefix_counter.get(prefix, 0) > prefix_threshold:
+def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=10, high_risk_score=30):
+    prefix = prefix_counter.get(ip_data.get("prefix"), None)
+    if prefix  > prefix_threshold:
         return high_risk_score
     return 0
 

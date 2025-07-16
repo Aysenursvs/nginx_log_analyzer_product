@@ -29,6 +29,7 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
             "last_seen": parsed_line.get("datetime_obj"),
             "country": get_geolocation(ip, cache).get("country"),
             "city": get_geolocation(ip, cache).get("city"),
+            "prefix": prefix,
             "risk_components": {
                 "bot": 0,
                 "suspicious": 0,

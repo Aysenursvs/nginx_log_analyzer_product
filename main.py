@@ -21,14 +21,14 @@ ip_location_cache = load_ip_location_cache()
 prefix_counter = load_prefix_counter()
 
 # Get total number of lines for progress bar
-total_lines = total_lines_in_file(log_file_path3)
+total_lines = total_lines_in_file(log_file_path2)
 
 #sim_thread = Thread(target=simulate_logging, args=(log_file_path, log_file_path2))
 #sim_thread.start()
 
 # Read log files
-log_lines = read_static_log_file(log_file_path3)
-log_lines_dynamic = follow_log_file(log_file_path3)
+log_lines = read_static_log_file(log_file_path2)
+log_lines_dynamic = follow_log_file(log_file_path2)
 
 def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
     for line_number,line in enumerate(tqdm(log_lines, total=total_lines, desc="Processing log lines"), start=1):
@@ -47,7 +47,7 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
     save_prefix_counter(prefix_counter)
     save_bad_lines_to_file(bad_lines)
 
-run(log_lines_dynamic, total_lines, ip_location_cache, ip_datas, bad_lines)
+run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines)
 
 #save_ip_data_to_file('/home/aysenur/projects/nginx_analyzer/ip_datas.json', ip_datas)
 
