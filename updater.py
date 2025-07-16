@@ -34,7 +34,8 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
                 "bot": 0,
                 "suspicious": 0,
                 "rate_limit": 0,
-                "prefix": 0
+                "prefix": 0,
+                "location": 0
             },
 
             "risk_score": 0,

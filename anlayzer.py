@@ -32,7 +32,7 @@ def is_unknown_or_weird_user_agent(ua: str) -> bool:
     return False
 
 def calculate_bot_risk(ip_data):
-    known_safe_bots = ["googlebot", "bingbot", "yandexbot", "baiduspider"]
+    known_safe_bots = ["google", "bing", "yandex", "baiduspider"]
     suspicious_agents = ["python", "curl", "wget", "requests", "scrapy", "aiohttp"]
 
     user_agents = ip_data.get("user_agents", [])
@@ -92,16 +92,38 @@ def calculate_rate_limit_risk(ip_data) -> int:
     return 0
 
 def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=500, high_risk_score=10):
-    prefix = prefix_counter.get(ip_data.get("prefix"), None)
-    if prefix  > prefix_threshold:
+    prefix_count = prefix_counter.get(ip_data.get("prefix"), None)
+    if ip_data.get("request_count") != prefix_count and prefix_count  > prefix_threshold:
         return high_risk_score
     return 0
+
+def calculate_location_risk(ip_data):
+    country = ip_data.get("country")
+    suspicious_flag = ip_data.get("is_suspicious", False)
+
+    # Suspicious flag True değilse, lokasyona göre risk ekleme
+    if not suspicious_flag:
+        return 0
+
+    # Lokasyon verisi yoksa (geolocation başarısız)
+    if country is None or country.strip() == "":
+        return 20
+
+    # Şüpheli ülkeler listesi
+    suspicious_countries = ["RU", "CN", "KP", "IR", "NG", "BR", "VN"]
+
+    if country in suspicious_countries:
+        return 25
+    else:
+        return 0
+
 
 
 def calculate_risk_score(ip_data, prefix_counter= None):
     bot_risk = calculate_bot_risk(ip_data)
     suspicious_risk = calculate_suspicious_risk_by_suspicious_flag(ip_data)
     rate_limit_risk = calculate_rate_limit_risk(ip_data)
+    location_risk = calculate_location_risk(ip_data)
     prefix_risk = 0
 
     if prefix_counter is not None:
@@ -111,6 +133,7 @@ def calculate_risk_score(ip_data, prefix_counter= None):
     ip_data["risk_components"]["suspicious"] = suspicious_risk
     ip_data["risk_components"]["rate_limit"] = rate_limit_risk
     ip_data["risk_components"]["prefix"] = prefix_risk
+    ip_data["risk_components"]["location"] = location_risk
 
-    ip_data["risk_score"] = bot_risk + suspicious_risk + rate_limit_risk + prefix_risk
+    ip_data["risk_score"] = bot_risk + suspicious_risk + rate_limit_risk + prefix_risk + location_risk
 
