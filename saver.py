@@ -42,3 +42,7 @@ def save_bad_lines_to_file(bad_lines):
 def save_ip_location_cache(cache, file_path="ip_location_cache.json"):
     with open(file_path, "w") as f:
         json.dump(cache, f, indent=4)
+
+def save_prefix_counter(counter, file_path="prefix_counter.json"):
+    with open(file_path, "w") as f:
+        json.dump(counter, f, indent=4)

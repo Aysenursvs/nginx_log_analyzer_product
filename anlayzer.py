@@ -62,17 +62,26 @@ def calculate_rate_limit_risk(ip_data) -> int:
         return 30
     return 0
 
+def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=100, high_risk_score=30):
+    prefix = ip_data.get("prefix")
+    if prefix and prefix_counter.get(prefix, 0) > prefix_threshold:
+        return high_risk_score
+    return 0
 
-def calculate_risk_score(ip_data):
+
+def calculate_risk_score(ip_data, prefix_counter= None):
     bot_risk = calculate_bot_risk(ip_data)
     suspicious_risk = calculate_suspicious_risk_by_suspicious_flag(ip_data)
     rate_limit_risk = calculate_rate_limit_risk(ip_data)
+    prefix_risk = 0
+
+    if prefix_counter is not None:
+        prefix_risk = calculate_prefix_risk(ip_data, prefix_counter)
 
     ip_data["risk_components"]["bot"] = bot_risk
     ip_data["risk_components"]["suspicious"] = suspicious_risk
     ip_data["risk_components"]["rate_limit"] = rate_limit_risk
+    ip_data["risk_components"]["prefix"] = prefix_risk
 
-    ip_data["risk_score"] = bot_risk + suspicious_risk + rate_limit_risk
-
-
+    ip_data["risk_score"] = bot_risk + suspicious_risk + rate_limit_risk + prefix_risk
 

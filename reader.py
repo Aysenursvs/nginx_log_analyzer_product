@@ -50,3 +50,9 @@ def load_ip_location_cache(file_path="ip_location_cache.json"):
             return json.load(f)
     return {}
 
+def load_prefix_counter(file_path="prefix_counter.json"):
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            return json.load(f)
+    return {}
+

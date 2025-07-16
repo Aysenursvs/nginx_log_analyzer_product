@@ -4,7 +4,7 @@ from datetime import datetime
 import geocoder
            
 
-def update_ip_record(parsed_line, ip_datas, cache):
+def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
     """
     Updates the IP data record with the parsed log line information.
     
@@ -12,6 +12,11 @@ def update_ip_record(parsed_line, ip_datas, cache):
     :param ip_data: A dictionary containing existing IP data records
     """
     ip = parsed_line.get("ip")
+    prefix = get_prefix(ip, parts=2)
+
+    prefix_counter[prefix] = prefix_counter.get(prefix, 0) + 1
+
+
     if ip not in ip_datas:
         ip_datas[ip] = {
             "request_times": [parsed_line.get("datetime_obj")],
@@ -27,7 +32,8 @@ def update_ip_record(parsed_line, ip_datas, cache):
             "risk_components": {
                 "bot": 0,
                 "suspicious": 0,
-                "rate_limit": 0
+                "rate_limit": 0,
+                "prefix": 0
             },
 
             "risk_score": 0,
@@ -59,6 +65,13 @@ def get_geolocation(ip, cache):
     cache[ip] = location
     return location
 
+def get_prefix(ip, parts=2):
+    """
+    IP'nin ilk `parts` kadar oktetini alır, prefix olarak döner.
+    Örnek: '66.249.68.131' -> '66.249'
+    """
+    return '.'.join(ip.split('.')[:parts])
+
 
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:
@@ -89,15 +102,15 @@ def update_action_by_risk_score(ip_data: dict) -> str:
 
 
 
-def update_ip_status(ip_data):
+def update_ip_status(ip_data, prefix_counter=None):
     bot_status = is_bot_by_user_agent(ip_data["user_agents"])
     update_bot_status(ip_data, bot_status)
     suspicious_status = check_request_count(ip_data, request_count_threshold)
     update_suspicious_status(ip_data, suspicious_status)
     rate_limit_status = is_rate_limit_exceeded(ip_data,  rate_limit_window_sec, max_requests)
     update_rate_limit_status(ip_data, rate_limit_status)
-    calculate_risk_score(ip_data)
-    
+    calculate_risk_score(ip_data, prefix_counter)
+
     update_action_by_risk_score(ip_data)
 
 
