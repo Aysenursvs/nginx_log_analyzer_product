@@ -1,5 +1,5 @@
 from reader import read_static_log_file, follow_log_file, load_ip_location_cache, total_lines_in_file
-from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_file
+from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_file, save_ip_location_cache
 from parser import parse_log_line
 from updater import update_ip_record, print_record, update_ip_status
 from actions import give_warning
@@ -12,6 +12,7 @@ from threading import Thread
 
 log_file_path = '/home/aysenur/projects/nginx_analyzer/nginx.vhost.access.log'
 log_file_path2 = '/home/aysenur/projects/nginx_analyzer/nginx-access-example.log'
+log_file_path3 = '/home/aysenur/projects/nginx_analyzer/nginx-access-example-copy.log'
 ip_datas = {}
 bad_lines = []
 
@@ -19,14 +20,14 @@ bad_lines = []
 ip_location_cache = load_ip_location_cache()
 
 # Get total number of lines for progress bar
-total_lines = total_lines_in_file(log_file_path2)
+total_lines = total_lines_in_file(log_file_path3)
 
-sim_thread = Thread(target=simulate_logging, args=(log_file_path, log_file_path2))
-sim_thread.start()
+#sim_thread = Thread(target=simulate_logging, args=(log_file_path, log_file_path2))
+#sim_thread.start()
 
 # Read log files
-log_lines = read_static_log_file(log_file_path2)
-log_lines_dynamic = follow_log_file(log_file_path2)
+log_lines = read_static_log_file(log_file_path3)
+log_lines_dynamic = follow_log_file(log_file_path3)
 
 def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
     for line in tqdm(log_lines, total=total_lines, desc="Processing log lines"):
@@ -35,6 +36,7 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
             bad_lines.append(line)
             continue
         ip_data = update_ip_record(parsed_line, ip_datas, ip_location_cache)
+        save_ip_location_cache(ip_location_cache)
         update_ip_status(ip_data)
 
         give_warning(ip_data, ip=parsed_line.get('ip'))
@@ -43,7 +45,7 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
         
     save_bad_lines_to_file(bad_lines)
 
-run(log_lines_dynamic, total_lines, ip_location_cache, ip_datas, bad_lines)
+run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines)
 
 #save_ip_data_to_file('/home/aysenur/projects/nginx_analyzer/ip_datas.json', ip_datas)
 

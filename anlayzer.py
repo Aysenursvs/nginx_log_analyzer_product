@@ -41,7 +41,7 @@ def calculate_bot_risk(ip_data):
     return risk
 
 
-def calculate_suspicious_risk(ip_data) -> int:
+def calculate_suspicious_risk_by_request_count(ip_data) -> int:
     count = ip_data.get("request_count", 0)
     if count < 1000:
         return 0
@@ -51,6 +51,11 @@ def calculate_suspicious_risk(ip_data) -> int:
         return 20
     else:
         return 40
+    
+def calculate_suspicious_risk_by_suspicious_flag(ip_data) -> int:
+    if ip_data.get("is_suspicious", False):
+        return 30
+    return 0
 
 def calculate_rate_limit_risk(ip_data) -> int:
     if ip_data["is_limit_exceeded"]:
@@ -60,7 +65,7 @@ def calculate_rate_limit_risk(ip_data) -> int:
 
 def calculate_risk_score(ip_data):
     bot_risk = calculate_bot_risk(ip_data)
-    suspicious_risk = calculate_suspicious_risk(ip_data)
+    suspicious_risk = calculate_suspicious_risk_by_suspicious_flag(ip_data)
     rate_limit_risk = calculate_rate_limit_risk(ip_data)
 
     ip_data["risk_components"]["bot"] = bot_risk
