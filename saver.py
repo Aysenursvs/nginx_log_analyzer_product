@@ -36,7 +36,8 @@ def save_bad_lines_to_file(bad_lines):
         return
     
     with open("bad_log_lines.txt", "w") as f:
-        f.writelines(bad_lines)
+        for line_number, line_content in bad_lines:
+            f.write(f"[Line {line_number}]: {line_content}")
 
 def save_ip_location_cache(cache, file_path="ip_location_cache.json"):
     with open(file_path, "w") as f:
