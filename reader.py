@@ -44,7 +44,7 @@ def total_lines_in_file(file_path):
         total_lines = sum(1 for _ in f)
     return total_lines
 
-def load_ip_location_cache(file_path="ip_location_cache.json"):
+def load_ip_location_cache(file_path="ip_location_cache_prefix.json"):
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
             return json.load(f)

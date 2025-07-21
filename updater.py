@@ -27,8 +27,8 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
             "is_suspicious": False,
             "is_limit_exceeded": False,
             "last_seen": parsed_line.get("datetime_obj"),
-            "country": get_geolocation(ip, cache).get("country"),
-            "city": get_geolocation(ip, cache).get("city"),
+            #"country": get_geolocation(ip, cache).get("country"),
+            #"city": get_geolocation(ip, cache).get("city"),
             "prefix": prefix,
             "risk_components": {
                 "bot": 0,
@@ -55,16 +55,28 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
 
 
 def get_geolocation(ip, cache):
-    if ip in cache:
-        return cache[ip]
+
+    prefix = get_prefix(ip, parts=2)
+    country = cache.get(ip, {}).get("country")
+    city = cache.get(ip, {}).get("city")
+
+    # Eğer country veya city "null" string ise, onları None olarak ele alalım:
+    if country == "null":
+        country = None
+    if city == "null":
+        city = None
+
+    if prefix in cache and country is not None and city is not None:
+        return cache[prefix]
 
     g = geocoder.ip(ip)
     location = {
         "city": g.city,
         "country": g.country,
-        "latlng": g.latlng
+        "latlng": g.latlng,
+        "IP": ip
     }
-    cache[ip] = location
+    cache[prefix] = location
     return location
 
 def get_prefix(ip, parts=2):
