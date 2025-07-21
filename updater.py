@@ -74,7 +74,7 @@ def get_geolocation(ip, cache):
         "city": g.city,
         "country": g.country,
         "latlng": g.latlng,
-        "IP": ip
+        "IP": {ip}
     }
     cache[prefix] = location
     return location

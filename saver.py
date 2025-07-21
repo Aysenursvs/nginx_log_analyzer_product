@@ -25,6 +25,7 @@ def save_single_ip_data(file_path, ip, ip_data):
     # Dosyaya tekrar yaz
     with open(file_path, 'w') as f:
         json.dump(data, f, default=str, indent=4)
+   
 
 def save_bad_lines_to_file(bad_lines):
     """
@@ -42,6 +43,7 @@ def save_bad_lines_to_file(bad_lines):
 def save_ip_location_cache(cache, file_path="ip_location_cache_prefix.json"):
     with open(file_path, "w") as f:
         json.dump(cache, f, indent=4)
+    
 
 def save_prefix_counter(counter, file_path="prefix_counter.json"):
     with open(file_path, "w") as f:

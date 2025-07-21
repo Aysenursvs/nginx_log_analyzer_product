@@ -4,4 +4,4 @@ def simulate_logging(source_file, target_file):
         for line in source:
             target.write(line)
             target.flush()
-            time.sleep(0.5)
+            #time.sleep(0.5)

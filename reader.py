@@ -4,20 +4,17 @@ import json
 import os
 
 def follow_log_file(file_path):
-    """
-    Yields all existing lines in the file, then continuously yields new lines as they are added.
-    Like `tail -f` but includes initial content.
-    """
     with open(file_path, "r") as f:
-        # İlk olarak dosyada var olan tüm satırları oku
         for line in f:
             yield line
-        # Sonra yeni satır geldikçe oku
         while True:
             line = f.readline()
             if not line:
+                print("Bekleniyor...")
+                f.seek(0, os.SEEK_CUR) 
                 time.sleep(0.5)
                 continue
+            
             yield line
 
 
