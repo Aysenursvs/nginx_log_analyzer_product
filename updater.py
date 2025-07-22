@@ -27,8 +27,8 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
             "is_suspicious": False,
             "is_limit_exceeded": False,
             "last_seen": parsed_line.get("datetime_obj"),
-            #"country": get_geolocation(ip, cache).get("country"),
-            #"city": get_geolocation(ip, cache).get("city"),
+            "country": get_geolocation_by_request(ip, cache).get("country"),
+            "city": get_geolocation_by_request(ip, cache).get("city"),
             "prefix": prefix,
             "risk_components": {
                 "bot": 0,
@@ -54,30 +54,104 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
 
 
 
+import requests
+
 def get_geolocation(ip, cache):
-
+    IPINFO_API_KEY = "1110fe2e554f9d"
     prefix = get_prefix(ip, parts=2)
-    country = cache.get(ip, {}).get("country")
-    city = cache.get(ip, {}).get("city")
+    country = cache.get(prefix, {}).get("country")
+    city = cache.get(prefix, {}).get("city")
 
-    # Eğer country veya city "null" string ise, onları None olarak ele alalım:
     if country == "null":
         country = None
     if city == "null":
         city = None
 
     if prefix in cache and country is not None and city is not None:
+        if cache[prefix].get("IP") and ip not in cache[prefix]["IP"]:
+            cache[prefix]["IP"].append(ip)
         return cache[prefix]
 
-    g = geocoder.ip(ip)
-    location = {
-        "city": g.city,
-        "country": g.country,
-        "latlng": g.latlng,
-        "IP": {ip}
+    # 🌐 1. API: geocoder (primary)
+    try:
+        g = geocoder.ip(ip)
+        if g.ok:
+            location = {
+                "city": g.city,
+                "country": g.country,
+                "latlng": g.latlng,
+                "IP": [ip],
+            }
+            cache[prefix] = location
+            return location
+        else:
+            print(f"[WARN] geocoder API response not OK for {ip}, trying fallback...")
+    except Exception as e:
+        print(f"[ERROR] geocoder API failed: {e}, trying fallback...")
+
+    try:
+        url = f"https://ipinfo.io/{ip}/json"
+        headers = {"Authorization": f"Bearer {IPINFO_API_KEY}"} if IPINFO_API_KEY else {}
+        response = requests.get(url, headers=headers, timeout=3)
+        data = response.json()
+
+        city = data.get("city")
+        country = data.get("country")
+        loc = data.get("loc")  # "latitude,longitude"
+        latlng = list(map(float, loc.split(","))) if loc else None
+
+        location = {
+            "city": city,
+            "country": country,
+            "latlng": latlng,
+            "IP": [ip],
+        }
+        cache[prefix] = location
+        return location
+    except Exception as e:
+        print(f"[IPinfo Hatası] {e}")
+
+    # ❌ Son çare: başarısız
+    print(f"[ERROR] Location could not be determined for {ip}")
+    return {
+        "city": None,
+        "country": None,
+        "latlng": None,
+        "IP": [ip],
     }
-    cache[prefix] = location
-    return location
+
+def get_geolocation_by_request(ip, cache):
+    IPINFO_API_KEY = "1110fe2e554f9d"
+    prefix = get_prefix(ip, parts=2)
+    
+    if prefix in cache and cache[prefix].get("country") and cache[prefix].get("city"):
+        if ip not in cache[prefix]["IP"]:
+            cache[prefix]["IP"].append(ip)
+        return cache[prefix]
+    
+    try:
+        url = f"https://ipinfo.io/{ip}/json"
+        headers = {"Authorization": f"Bearer {IPINFO_API_KEY}"} if IPINFO_API_KEY else {}
+        response = requests.get(url, headers=headers, timeout=3)
+        data = response.json()
+
+        city = data.get("city")
+        country = data.get("country")
+        loc = data.get("loc")  # "latitude,longitude"
+        latlng = list(map(float, loc.split(","))) if loc else None
+
+        location = {
+            "city": city,
+            "country": country,
+            "latlng": latlng,
+            "IP": [ip],
+        }
+        cache[prefix] = location
+        return location
+    except Exception as e:
+        print(f"[IPinfo Hatası] {e}")
+        return {"city": None, "country": None, "latlng": None, "IP": [ip]}
+
 
 def get_prefix(ip, parts=2):
     """
