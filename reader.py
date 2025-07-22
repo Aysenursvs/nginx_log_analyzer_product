@@ -42,7 +42,7 @@ def total_lines_in_file(file_path):
     return total_lines
 
 def load_ip_location_cache(file_path="ip_location_cache_prefix.json"):
-    if os.path.exists(file_path):
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         with open(file_path, "r") as f:
             return json.load(f)
     return {}
