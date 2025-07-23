@@ -3,19 +3,16 @@ from variables import block_risk_score, review_risk_score, request_count_thresho
 from datetime import datetime
 import requests
            
-
+# This function updates the IP record with the parsed log line.
+# It extracts the IP address, prefix, and other relevant information from the parsed line.
+# It updates the IP data in the ip_datas dictionary and increments the prefix counter.
+# It returns the updated IP data.
+# It is used in the main.py file to update the IP data after parsing each log line
 def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
-    """
-    Updates the IP data record with the parsed log line information.
-    
-    :param parsed_line: A dictionary containing parsed log line information
-    :param ip_data: A dictionary containing existing IP data records
-    """
     ip = parsed_line.get("ip")
+
     prefix = get_prefix(ip, parts=2)
-
     prefix_counter[prefix] = prefix_counter.get(prefix, 0) + 1
-
 
     if ip not in ip_datas:
         ip_datas[ip] = {
@@ -27,8 +24,8 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
             "is_suspicious": False,
             "is_limit_exceeded": False,
             "last_seen": parsed_line.get("datetime_obj"),
-            "country": get_geolocation_by_request(ip, cache).get("country"),
-            "city": get_geolocation_by_request(ip, cache).get("city"),
+            "country": get_geolocation_by_request(ip, cache, prefix).get("country"),
+            "city": get_geolocation_by_request(ip, cache, prefix).get("city"),
             "prefix": prefix,
             "risk_components": {
                 "bot": 0,
@@ -53,10 +50,16 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
     return ip_datas[ip]
 
 
-
-def get_geolocation_by_request(ip, cache):
+# This function retrieves the geolocation information for a given IP address.
+# It uses the IPinfo API to get the city and country information.
+# If the IP address is already in the cache, it returns the cached data.
+# If the IP address is not in the cache, it makes a request to the IPinfo API to get the geolocation data.
+# It returns a dictionary containing the city, country, latitude, longitude, and a list of IPs associated with that prefix.
+# It is used in the update_ip_record function to get the geolocation information for the IP address.
+# The cache is a dictionary where the keys are prefixes and the values are dictionaries containing the geolocation data.
+# The prefix is determined by the first two octets of the IP address.
+def get_geolocation_by_request(ip, cache, prefix):
     IPINFO_API_KEY = "1110fe2e554f9d"
-    prefix = get_prefix(ip, parts=2)
     
     if prefix in cache and cache[prefix].get("country") and cache[prefix].get("city"):
         if ip not in cache[prefix]["IP"]:
@@ -86,32 +89,45 @@ def get_geolocation_by_request(ip, cache):
         print(f"[IPinfo Error] {e}")
         return {"city": None, "country": None, "latlng": None, "IP": [ip]}
 
-
+# This function extracts the prefix from an IP address.
+# It takes an IP address and the number of parts to consider for the prefix.
+# The default is to consider the first two parts of the IP address.
+# It returns the prefix as a string.
 def get_prefix(ip, parts=2):
-    """
-    IP'nin ilk `parts` kadar oktetini alır, prefix olarak döner.
-    Örnek: '66.249.68.131' -> '66.249'
-    """
     return '.'.join(ip.split('.')[:parts])
 
+# ******************************************************
+# GENERAL UPDATE FUNCTIONS PART
+# ******************************************************
 
+# This function updates the bot status in the IP data.
+# It checks the is_bot flag in the IP data and updates it based on the bot status.
+# If the IP is not already marked as a bot and the bot status is True, it updates the is_bot flag to True.
 def update_bot_status(ip_data, bot_status):
     if not ip_data["is_bot"] and bot_status:
         ip_data["is_bot"] = bot_status
         
         
-    
-
+# This function updates the suspicious status in the IP data.
+# It checks the is_suspicious flag in the IP data and updates it based on the suspicious status.
+# If the IP is not already marked as suspicious and the suspicious status is True,
+# it updates the is_suspicious flag to True.    
 def update_suspicious_status(ip_data, suspicious_status):
     if not ip_data["is_suspicious"] and suspicious_status:
         ip_data["is_suspicious"] = suspicious_status
         
-
+#This function updates the rate limit status in the IP data.
+# It checks the is_limit_exceeded flag in the IP data and updates it based on the rate limit status.
+# If the IP is not already marked as rate limit exceeded and the rate limit status is True,
+# it updates the is_limit_exceeded flag to True.
 def update_rate_limit_status(ip_data, rate_limit_status):
     if not ip_data["is_limit_exceeded"] and rate_limit_status:
         ip_data["is_limit_exceeded"] = rate_limit_status
         
-
+# This function updates the action based on the risk score and the defined thresholds.
+# It sets the action to "block" if the risk score is greater than or equal to the block risk score,
+# to "review" if the risk score is greater than or equal to the review risk score,
+# and to "normal" otherwise.
 def update_action_by_risk_score(ip_data: dict) -> str:
     if ip_data["risk_score"] >= block_risk_score:
         ip_data["action"] = "block"
@@ -121,21 +137,30 @@ def update_action_by_risk_score(ip_data: dict) -> str:
         ip_data["action"] = "normal"
 
 
-
-
-
+# This function make all updates to the IP data.
+# It checks the bot status, suspicious status, and rate limit status,
+# updates the IP data accordingly, and calculates the risk score.
+# It also updates the action based on the risk score.
+# It is called in the main.py file after parsing each log line.
 def update_ip_status(ip_data, prefix_counter=None):
+
     bot_status = is_bot_by_user_agent(ip_data["user_agents"])
-    update_bot_status(ip_data, bot_status)
+    update_bot_status(ip_data, bot_status) 
+
     suspicious_status = check_request_count(ip_data, request_count_threshold)
     update_suspicious_status(ip_data, suspicious_status)
+
     rate_limit_status = is_rate_limit_exceeded(ip_data,  rate_limit_window_sec, max_requests)
     update_rate_limit_status(ip_data, rate_limit_status)
+
     calculate_risk_score(ip_data, prefix_counter)
 
     update_action_by_risk_score(ip_data)
 
-
+# This function prints the IP data in a readable format.
+# It iterates through the IP data dictionary and prints the relevant information for each IP.
+# It is used for debugging purposes to see the IP data after processing.
+# It can be called in the main.py file to print the IP data after processing all log lines.
 def print_record(ip_datas):
     for ip, data in ip_datas.items():
         print(f"IP: {ip}")
