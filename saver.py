@@ -64,3 +64,10 @@ def save_ip_location_cache(cache, file_path="ip_location_cache_prefix.json"):
 def save_prefix_counter(counter, file_path="prefix_counter.json"):
     with open(file_path, "w") as f:
         json.dump(counter, f, indent=4)
+
+
+def save_warning_to_file(warning, line_number, file_path="warnings.txt"):
+    if not warning:
+        return
+    with open(file_path, "a") as f:
+        f.write(f"[Line {line_number}]: {warning}\n")

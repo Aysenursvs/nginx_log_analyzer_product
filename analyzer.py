@@ -54,7 +54,7 @@ def is_unknown_or_weird_user_agent(ua: str) -> bool:
 # You can change the risk scores for known safe bots, suspicious agents, unknown bots, weird user agents, and the number of unique user agents.
 # You can update the known safe bots list, suspicious agents list.
 def calculate_bot_risk(ip_data):
-    known_safe_bots = ["google", "bing", "yandex", "baiduspider"]
+    known_safe_bots = ["google", "bing", "yandex", "baiduspider", "facebook"]
     suspicious_agents = ["python", "curl", "wget", "requests", "scrapy", "aiohttp"]
 
     user_agents = ip_data.get("user_agents", [])
@@ -77,15 +77,15 @@ def calculate_bot_risk(ip_data):
             has_weird_ua = True
 
     if has_tool:
-        risk += 40 # If a tool is detected, it indicates suspicious/bot behavior.
+        risk += 30 # If a tool is detected, it indicates suspicious/bot behavior.
     if has_unknown_bot:
-        risk += 25 # If an unknown bot is detected, it indicates suspicious behavior.
+        risk += 20 # If an unknown bot is detected, it indicates suspicious behavior.
     if has_safe_bot:
-        risk += 10 # If a safe bot is detected, it indicates usual bot behavior. Ex: Googlebot
+        risk += 5 # If a safe bot is detected, it indicates usual bot behavior. Ex: Googlebot
     if has_weird_ua:
-        risk += 20 # If a weird user agent is detected, it indicates suspicious behavior. Ex: empty, too short, no letters, etc.
+        risk += 15 # If a weird user agent is detected, it indicates suspicious behavior. Ex: empty, too short, no letters, etc.
     if len(user_agents) > 10:
-        risk += 15  # If there are more than 10 unique user agents, it indicates suspicious behavior.
+        risk += 5 # If there are more than 10 unique user agents, it indicates suspicious behavior.
 
     return risk
 
@@ -96,7 +96,7 @@ def calculate_bot_risk(ip_data):
 # The default value is 30.    
 def calculate_suspicious_risk_by_suspicious_flag(ip_data) -> int:
     if ip_data.get("is_suspicious", False):
-        return 30
+        return 15
     return 0
 
 # This function calculates the rate limit risk score based on the rate limit exceeded flag.
@@ -106,7 +106,7 @@ def calculate_suspicious_risk_by_suspicious_flag(ip_data) -> int:
 # The default value is 30.
 def calculate_rate_limit_risk(ip_data) -> int:
     if ip_data["is_limit_exceeded"]:
-        return 30
+        return 25
     return 0
 
 # This function calculates the prefix risk score based on the prefix counter.
@@ -116,7 +116,7 @@ def calculate_rate_limit_risk(ip_data) -> int:
 # The prefix threshold is set to 500 by default.
 # The high risk score is set to 10 by default.
 # You can change the prefix threshold and the risk score here.
-def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=500, high_risk_score=10):
+def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300, high_risk_score=10):
     prefix_count = prefix_counter.get(ip_data.get("prefix"), None)
     if ip_data.get("request_count") != prefix_count and prefix_count  > prefix_threshold:
         return high_risk_score
@@ -138,13 +138,13 @@ def calculate_location_risk(ip_data):
 
     # Lokasyon verisi yoksa (geolocation başarısız)
     if country is None or country.strip() == "":
-        return 20
+        return 15
 
     # Şüpheli ülkeler listesi
     suspicious_countries = ["RU", "CN", "KP", "IR", "NG", "BR", "VN"]
 
     if country in suspicious_countries:
-        return 25
+        return 20
     else:
         return 0
 

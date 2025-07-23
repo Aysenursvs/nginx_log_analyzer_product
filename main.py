@@ -1,5 +1,5 @@
 from reader import read_static_log_file, follow_log_file, load_ip_location_cache, total_lines_in_file, load_prefix_counter
-from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter
+from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter,save_warning_to_file
 from parser import parse_log_line
 from updater import update_ip_record,update_ip_status
 from actions import give_warning
@@ -40,16 +40,18 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
         
         update_ip_status(ip_data, prefix_counter)
 
-        give_warning(ip_data, ip=parsed_line.get('ip'))
-
+        warning = give_warning(ip_data, ip=parsed_line.get('ip'))
+        print(warning) if warning else None
+        save_warning_to_file(warning, line_number)
+        
         #save_single_ip_data('/home/aysenur/projects/nginx_analyzer/ip_datas_real_static.json', parsed_line.get('ip'), ip_data)
         
         if line_number % 1000 == 0:
             save_ip_location_cache(ip_location_cache)
             save_ip_data_to_file(log_results_file_path, ip_datas)
-            save_prefix_counter(prefix_counter)
+            #save_prefix_counter(prefix_counter)
             save_bad_lines_to_file(bad_lines)
-        
+        print(f"[Line {line_number}]:IP: {parsed_line.get('ip')} - Action: {ip_data['action']} - Risk Score: {ip_data['risk_score']}")
 
 
 run(log_lines_dynamic, total_lines, ip_location_cache, ip_datas, bad_lines)

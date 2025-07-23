@@ -27,12 +27,12 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
             "country": get_geolocation_by_request(ip, cache, prefix).get("country"),
             "city": get_geolocation_by_request(ip, cache, prefix).get("city"),
             "prefix": prefix,
-            "risk_components": {
-                "bot": 0,
-                "suspicious": 0,
-                "rate_limit": 0,
-                "prefix": 0,
-                "location": 0
+            "risk_components": {    # Risk components for risk score calculation
+                "bot": 0,           # Determined by checking user agents
+                "suspicious": 0,    # Determined by checking is_suspicious flag
+                "rate_limit": 0,    # Determined by checking is_limit_exceeded flag
+                "prefix": 0,        # Determined by checking prefix request count
+                "location": 0       # Determined by checking geolocation data
             },
 
             "risk_score": 0,

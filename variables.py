@@ -25,7 +25,7 @@ log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_data
 # If the request count is greater than or equal to this value, it is considered suspicious.
 # is_suspicious flag is set to True in the update_ip_status function (in the updater.py) if the request count is suspicious.
 # You can change this value here.
-request_count_threshold = 150
+request_count_threshold = 1000
 
 # is_rate_limit_exceeded function (in the analyzer.py but called in the updater.py) checks rate limit against this threshold.
 # default value for window_sec is 60 (in the function)
@@ -35,7 +35,7 @@ request_count_threshold = 150
 # is_limit_exceeded flag is set to True in the update_ip_status function (in the updater.py) if the rate limit is exceeded.
 # You can change this value here.
 rate_limit_window_sec = 60
-max_requests = 100
+max_requests = 2400
 
 # update_action_by_risk_score function (in the updater.py) uses these risk scores to determine actions.
 # These values are used to determine if the IP should be blocked or reviewed.
@@ -45,8 +45,8 @@ max_requests = 100
 # then give_warning function prints a warning message and sets the review_warning flag to True.
 # You can change these values here.
  
-block_risk_score = 80
-review_risk_score = 50
+block_risk_score = 70
+review_risk_score = 40
 
 ## analyzer.py ##
 # If you want to change the risk scores for bot, suspicious, rate limit, prefix, and location,

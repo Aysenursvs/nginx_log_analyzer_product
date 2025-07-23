@@ -5,10 +5,12 @@
 #If the action is "block", it prints a block warning message and sets the block_warning flag to True.
 #The warning messages include the IP address, action, and risk score.
 def give_warning(ip_data:dict, ip):
+    warning = ""
     if ip_data["action"] != "normal":
         if ip_data['action'] == "review" and not ip_data["review_warning"]:
-            print(f"Review Warning: IP {ip} has action '{ip_data['action']}' with risk score {ip_data['risk_score']}.")
+            warning = f"Review Warning: IP {ip} has action '{ip_data['action']}' with risk score {ip_data['risk_score']}."
             ip_data["review_warning"] = True
         if ip_data['action'] == "block" and not ip_data["block_warning"]:
-            print(f"Block Warning: IP {ip} has action '{ip_data['action']}' with risk score {ip_data['risk_score']}.")
+            warning = f"Block Warning: IP {ip} has action '{ip_data['action']}' with risk score {ip_data['risk_score']}."
             ip_data["block_warning"] = True
+    return warning
