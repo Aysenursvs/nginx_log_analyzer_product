@@ -122,7 +122,7 @@ def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300, high_ri
         return high_risk_score
     return 0
 
-# This function calculates the location risk score based on the country.
+# This function calculates the location risk score based on the country and is_suspicious flag.
 # It returns a risk score of 20 if the country is suspicious, otherwise it returns 0.
 # The suspicious countries are defined in the function.
 # If the country is not found, it returns a risk score of 20.
@@ -132,17 +132,18 @@ def calculate_location_risk(ip_data):
     country = ip_data.get("country")
     suspicious_flag = ip_data.get("is_suspicious", False)
 
-    # Suspicious flag True değilse, lokasyona göre risk ekleme
+    # is_suspicious flag is False, no need to check location
     if not suspicious_flag:
         return 0
 
-    # Lokasyon verisi yoksa (geolocation başarısız)
+    # If country is None or empty, return risk score
     if country is None or country.strip() == "":
         return 15
 
-    # Şüpheli ülkeler listesi
+    # Suspicious countries list
+    # You can change the suspicious countries here.
     suspicious_countries = ["RU", "CN", "KP", "IR", "NG", "BR", "VN"]
-
+    # If country is in suspicious countries, return risk score
     if country in suspicious_countries:
         return 20
     else:
