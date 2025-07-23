@@ -1,25 +1,22 @@
 from reader import read_static_log_file, follow_log_file, load_ip_location_cache, total_lines_in_file, load_prefix_counter
 from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter
 from parser import parse_log_line
-from updater import update_ip_record, print_record, update_ip_status
+from updater import update_ip_record,update_ip_status
 from actions import give_warning
+from variables import source_file_path_real, target_file_path_real, source_file_path_example, target_file_path_example, ip_location_cache_file_path
 from simulator import simulate_logging
-import os
 from tqdm import tqdm
 from threading import Thread
 
 
 
-source_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx.vhost.access.log'
-target_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx-access-example.log'
-log_file_path3 = '/home/aysenur/projects/nginx_analyzer/nginx-access-example-copy.log'
-source_file_path_example = '/home/aysenur/projects/nginx_analyzer/nginx-source-log.log'
-target_file_path_example = '/home/aysenur/projects/nginx_analyzer/nginx-target-log.log'
+
+
 ip_datas = {}
 bad_lines = []
 
 # Load IP location cache
-ip_location_cache = load_ip_location_cache()
+ip_location_cache = load_ip_location_cache(ip_location_cache_file_path)
 prefix_counter = load_prefix_counter()
 
 # Get total number of lines for progress bar
@@ -30,7 +27,7 @@ total_lines = total_lines_in_file(source_file_path_real)
 
 # Read log files
 log_lines = read_static_log_file(source_file_path_real)
-log_lines_dynamic = follow_log_file(target_file_path_example)
+log_lines_dynamic = follow_log_file(target_file_path_real)
 
 def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
     for line_number, line in enumerate(tqdm(log_lines, total=total_lines, desc="Processing log lines"), start=1):
@@ -49,19 +46,14 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
         if line_number % 1000 == 0:
             save_ip_location_cache(ip_location_cache)
             save_ip_data_to_file('/home/aysenur/projects/nginx_analyzer/ip_datas_real_dynamic_location.json', ip_datas)
-            #save_prefix_counter(prefix_counter)
+            save_prefix_counter(prefix_counter)
             save_bad_lines_to_file(bad_lines)
-        #print(f"Processed {line_number} lines, saved progress.")
-        #print(f"Current IP data: {ip_data.get('prefix')}, Risk Score: {ip_datas.get(parsed_line.get('ip'), {}).get('risk_score', 'N/A')}")
+        
 
-try:
-    run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines)
-except KeyboardInterrupt:
-    print("Stopped by user")
 
-#save_ip_data_to_file('/home/aysenur/projects/nginx_analyzer/ip_datas.json', ip_datas)
+run(log_lines_dynamic, total_lines, ip_location_cache, ip_datas, bad_lines)
 
-#print_record(ip_datas)
+
 
 
 

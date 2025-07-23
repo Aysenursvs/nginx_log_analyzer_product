@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from variables import bot_risk_score, suspicious_risk_score, rate_limit_risk_score
 
+
+#
+
 def is_bot_by_user_agent(user_agents: list[str]) -> bool:
     known_bots_pharases = ["bot", "crawl", "spider", "slurp", "archive", "checker"]
 
@@ -19,6 +22,7 @@ def is_rate_limit_exceeded(ip_data: dict, window_sec: int = 60, max_requests: in
     recent_requests = [t for t in ip_data["request_times"] if now - t <= timedelta(seconds=window_sec)]
     return len(recent_requests) >= max_requests
 
+# Analyze and calculate risk scores
 # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ######   Eklenen Risk Skorlar değişiklik gösterebilir ya da bir değişkene atanıp o değişken değerleri kullanılabilir.
 def is_unknown_or_weird_user_agent(ua: str) -> bool:
