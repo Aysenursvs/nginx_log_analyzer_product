@@ -3,7 +3,7 @@ from saver import save_ip_data_to_file, save_single_ip_data, save_bad_lines_to_f
 from parser import parse_log_line
 from updater import update_ip_record,update_ip_status
 from actions import give_warning
-from variables import source_file_path_real, target_file_path_real, source_file_path_example, target_file_path_example, ip_location_cache_file_path
+from variables import source_file_path_real, target_file_path_real, source_file_path_example, target_file_path_example, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path
 from simulator import simulate_logging
 from tqdm import tqdm
 from threading import Thread
@@ -11,13 +11,14 @@ from threading import Thread
 
 
 
-
+# Initialize data structures
 ip_datas = {}
 bad_lines = []
 
 # Load IP location cache
 ip_location_cache = load_ip_location_cache(ip_location_cache_file_path)
-prefix_counter = load_prefix_counter()
+# Load prefix counter
+prefix_counter = load_prefix_counter(prefix_counter_file_path)
 
 # Get total number of lines for progress bar
 total_lines = total_lines_in_file(source_file_path_real)
@@ -45,7 +46,7 @@ def run(log_lines, total_lines, ip_location_cache, ip_datas, bad_lines):
         
         if line_number % 1000 == 0:
             save_ip_location_cache(ip_location_cache)
-            save_ip_data_to_file('/home/aysenur/projects/nginx_analyzer/ip_datas_real_dynamic_location.json', ip_datas)
+            save_ip_data_to_file(log_results_file_path, ip_datas)
             save_prefix_counter(prefix_counter)
             save_bad_lines_to_file(bad_lines)
         

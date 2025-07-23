@@ -1,15 +1,15 @@
 import re
 from datetime import datetime
 
+# This function parses a log line and returns a dictionary with the parsed information.
+# It extracts the IP address, datetime, request, status code, size, referer,
+# and user agent from the log line.
+# The log line format is expected to be:
+# <ip> - - [<datetime>] "<request>" <status> <size> "<referer>" "<user_agent>"
+# Example: 95.108.213.89 - - [15/Jul/2025:00:05:20 +0300] "GET /bitstream/11147/3469/1/T000581.pdf HTTP/1.1" 200 944600 "-" "Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0"
 
 def parse_log_line(line):
-    """
-    Parses a single line of the log file and extracts relevant information.
     
-    :param line: A line from the log file
-    :return: A dictionary containing the parsed information
-    """
-    # Example: 172.18.0.1 - - [14/Jul/2025:07:53:41 +0000] "GET /auth/login-page HTTP/1.1" 200 2104 "http://localhost/" "Googlebot/2.1 (+http://www.google.com/bot.html)"
     try:
         match = re.match(r'(\S+) - - \[([^\]]+)\] "([^"]+)" (\d+) (\d+) "([^"]*)" "([^"]*)"', line)
         if not match:
@@ -25,10 +25,10 @@ def parse_log_line(line):
 
         dt_obj = None
         try:
-            dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S %z")  # offset'li dene
+            dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S %z")  # try with offset, with offset example: 15/Jul/2025:00:05:20 +0300
         except ValueError:
             try:
-                dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S")  # offset'siz dene
+                dt_obj = datetime.strptime(datetime_str, "%d/%b/%Y:%H:%M:%S")  # try without offset, without offset example: 15/Jul/2025:00:05:20
             except ValueError:
                 return None
         
