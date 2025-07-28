@@ -3,7 +3,7 @@ from saver import save_ip_data_to_file,save_bad_lines_to_file, save_ip_location_
 from parser import parse_log_line
 from updater import update_ip_record,update_ip_status
 from actions import give_warning
-from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path
+from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path, logging_file_path
 import logging
 
 
@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("analyzer.log")
+        logging.FileHandler(logging_file_path)
     ]
 )
 

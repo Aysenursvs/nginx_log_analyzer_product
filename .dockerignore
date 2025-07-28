@@ -1,0 +1,45 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+*.pyc
+__pycache__/
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Docker related
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Environment files
+.env
+.env.local
+.env.*.local
+venv/
+.venv/
+env/
+ENV/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Project specific
+README.md
+LICENSE
+docs/
+tests/
+*.md

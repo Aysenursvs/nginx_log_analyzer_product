@@ -19,8 +19,8 @@ warnings_file_path = '/home/aysenur/projects/nginx_analyzer/warnings.txt'
 #save_ip_data_to_file function saves ip data to this file
 log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_datas_real_dynamic_location.json'
 
-
-
+# This file is used to save the results of the analysis.
+logging_file_path = '/home/aysenur/projects/nginx_analyzer/lanalyzer.log'
 
 
 ## updater.py ##
