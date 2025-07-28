@@ -4,7 +4,7 @@
 #If the action is "review", it prints a review warning message and sets the review_warning flag to True.
 #If the action is "block", it prints a block warning message and sets the block_warning flag to True.
 #The warning messages include the IP address, action, and risk score.
-def give_warning(ip_data:dict, ip, line_number=None) -> str:
+def give_warning(ip_data:dict, ip) -> str:
     warning = ""
     if ip_data["action"] != "normal":
         if ip_data['action'] == "review" and not ip_data["review_warning"]:

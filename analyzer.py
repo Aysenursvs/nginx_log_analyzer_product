@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 # This function checks if the user agent is a bot based on known phrases.
 # It returns True if any of the phrases are found in the user agent string.
 def is_bot_by_user_agent(user_agents: list[str]) -> bool:
+    user_agents = list(user_agents)
     known_bots_pharases = ["bot", "crawl", "spider", "slurp", "archive", "checker"]
 
     for user_agent in user_agents:
@@ -53,7 +54,7 @@ def is_unknown_or_weird_user_agent(ua: str) -> bool:
 # It returns a risk score based on the analysis.
 # You can change the risk scores for known safe bots, suspicious agents, unknown bots, weird user agents, and the number of unique user agents.
 # You can update the known safe bots list, suspicious agents list.
-def calculate_bot_risk(ip_data):
+def calculate_bot_risk(ip_data: dict) -> int:
     known_safe_bots = ["google", "bing", "yandex", "baiduspider", "facebook"]
     suspicious_agents = ["python", "curl", "wget", "requests", "scrapy", "aiohttp"]
 
@@ -116,8 +117,8 @@ def calculate_rate_limit_risk(ip_data) -> int:
 # The prefix threshold is set to 300 by default.
 # The high risk score is set to 10 by default.
 # You can change the prefix threshold and the risk score here.
-def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300):
-    prefix_count = prefix_counter.get(ip_data.get("prefix"), None)
+def calculate_prefix_risk(ip_data: dict, prefix_counter: dict, prefix_threshold: int = 300) -> int:
+    prefix_count = prefix_counter.get(ip_data.get("prefix"), 0)
     if ip_data.get("request_count") != prefix_count and prefix_count  > prefix_threshold:
         return 10
     return 0
@@ -128,7 +129,7 @@ def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300):
 # If the country is not found, it returns a risk score of 20.
 # You can change the suspicious countries and the risk score here.
 # The default value is 20.
-def calculate_location_risk(ip_data):
+def calculate_location_risk(ip_data) -> int:
     country = ip_data.get("country")
     suspicious_flag = ip_data.get("is_suspicious", False)
 
@@ -160,7 +161,7 @@ def calculate_location_risk(ip_data):
 # This function calculates the total risk score based on various risk components by calling the individual risk calculation functions.
 # It updates the risk components in the IP data and returns the total risk score.
 # The risk components are: bot, suspicious, rate limit, prefix, and location.
-def calculate_risk_score(ip_data, prefix_counter= None):
+def calculate_risk_score(ip_data: dict, prefix_counter: dict = None) -> int:
     bot_risk = calculate_bot_risk(ip_data)
     suspicious_risk = calculate_suspicious_risk_by_suspicious_flag(ip_data)
     rate_limit_risk = calculate_rate_limit_risk(ip_data)

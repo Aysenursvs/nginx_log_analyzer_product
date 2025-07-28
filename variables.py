@@ -25,6 +25,8 @@ log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_data
 
 ## updater.py ##
 
+API_KEY = "1110fe2e554f9d"
+
 # check_request_count function (in the analyzer.py but called in the updater.py) checks request count against this threshold.
 # default value is 10000 (in the function)
 # This value is used to determine if the request count is suspicious. 

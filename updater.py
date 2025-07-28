@@ -1,7 +1,8 @@
+import logging
 from analyzer import is_bot_by_user_agent, check_request_count, is_rate_limit_exceeded, calculate_risk_score
-from variables import block_risk_score, review_risk_score, request_count_threshold,  rate_limit_window_sec, max_requests
-from datetime import datetime
+from variables import block_risk_score, review_risk_score, request_count_threshold,  rate_limit_window_sec, max_requests, API_KEY
 import requests
+import time
            
 # This function updates the IP record with the parsed log line.
 # It extracts the IP address, prefix, and other relevant information from the parsed line.
@@ -44,7 +45,8 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
         ip_datas[ip]["request_times"].append(parsed_line.get("datetime_obj"))
         ip_datas[ip]["user_agents"].add(parsed_line.get("user_agent"))
         ip_datas[ip]["request_count"] += 1
-        ip_datas[ip]["status_codes"][parsed_line.get("status")] = ip_datas[ip]["status_codes"].get(parsed_line.get("status"), 0) + 1
+        status = parsed_line.get("status") or "unknown"
+        ip_datas[ip]["status_codes"][status] = ip_datas[ip]["status_codes"].get(status, 0) + 1
         ip_datas[ip]["last_seen"] = parsed_line.get("datetime_obj")
 
     return ip_datas[ip]
@@ -59,41 +61,54 @@ def update_ip_record(parsed_line, ip_datas, cache, prefix_counter):
 # The cache is a dictionary where the keys are prefixes and the values are dictionaries containing the geolocation data.
 # The prefix is determined by the first two octets of the IP address.
 def get_geolocation_by_request(ip, cache, prefix):
-    IPINFO_API_KEY = "1110fe2e554f9d"
-    
+    IPINFO_API_KEY = API_KEY
+    url = f"https://ipinfo.io/{ip}/json"
+    headers = {"Authorization": f"Bearer {IPINFO_API_KEY}"} if IPINFO_API_KEY else {}
+
+    # Check if the prefix is already in the cache
+    # If it is, return the cached data if it contains country and city information.
     if prefix in cache and cache[prefix].get("country") and cache[prefix].get("city"):
         if ip not in cache[prefix]["IP"]:
             cache[prefix]["IP"].append(ip)
         return cache[prefix]
-    
-    try:
-        url = f"https://ipinfo.io/{ip}/json"
-        headers = {"Authorization": f"Bearer {IPINFO_API_KEY}"} if IPINFO_API_KEY else {}
-        response = requests.get(url, headers=headers, timeout=3)
-        data = response.json()
 
-        city = data.get("city")
-        country = data.get("country")
-        loc = data.get("loc")  # "latitude,longitude"
-        latlng = list(map(float, loc.split(","))) if loc else None
+    retries = 3
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers, timeout=3)
+            if response.status_code == 200:
+                data = response.json()
 
-        location = {
-            "city": city,
-            "country": country,
-            "latlng": latlng,
-            "IP": [ip],
-        }
-        cache[prefix] = location
-        return location
-    except Exception as e:
-        print(f"[IPinfo Error] {e}")
-        return {"city": None, "country": None, "latlng": None, "IP": [ip]}
+                city = data.get("city")
+                country = data.get("country")
+                loc = data.get("loc")  # "latitude,longitude"
+                latlng = list(map(float, loc.split(","))) if loc else None
+
+                location = {
+                    "city": city,
+                    "country": country,
+                    "latlng": latlng,
+                    "IP": [ip],
+                }
+                cache[prefix] = location
+                return location
+            else:
+                logging.warning(f"IPinfo returned status {response.status_code} for IP {ip}")
+        except requests.RequestException as e:
+            logging.error(f"[IPinfo Error] Attempt {attempt+1}/{retries} for IP {ip}: {e}")
+
+        time.sleep(0.5)  # Wait for a short period before retrying
+
+    # If all attempts fail, return a default value
+    return {"city": None, "country": None, "latlng": None, "IP": [ip]}
 
 # This function extracts the prefix from an IP address.
 # It takes an IP address and the number of parts to consider for the prefix.
 # The default is to consider the first two parts of the IP address.
 # It returns the prefix as a string.
 def get_prefix(ip, parts=2):
+    if not ip or '.' not in ip:
+        return "unknown"
     return '.'.join(ip.split('.')[:parts])
 
 
@@ -160,32 +175,3 @@ def update_ip_status(ip_data, prefix_counter=None):
 
     update_action_by_risk_score(ip_data)
 
-# This function prints the IP data in a readable format.
-# It iterates through the IP data dictionary and prints the relevant information for each IP.
-# It is used for debugging purposes to see the IP data after processing.
-# It can be called in the main.py file to print the IP data after processing all log lines.
-def print_record(ip_datas):
-    for ip, data in ip_datas.items():
-        print(f"IP: {ip}")
-        print(f"  Request Times: {data['request_times']}")
-        print(f"  User Agents: {data['user_agents']}")
-        print(f"  Request Count: {data['request_count']}")
-        print(f"  Status Codes: {data['status_codes']}")
-        print(f"  Is Bot: {data['is_bot']}")
-        print(f"  Is Suspicious: {data['is_suspicious']}")
-        print(f"  Is Rate Limit Exceeded: {data['is_limit_exceeded']}")
-        print(f"  Last Seen: {data['last_seen']}\n")
-        print(f"  Country: {data['country']}")
-        print(f"  City: {data['city']}")
-        print(f"  Risk Components:")
-        print(f"    Bot: {data['risk_components']['bot']}")
-        print(f"    Suspicious: {data['risk_components']['suspicious']}")
-        print(f"    Rate Limit: {data['risk_components']['rate_limit']}")
-        print(f"    Prefix: {data['risk_components']['prefix']}")
-        print(f"    Location: {data['risk_components']['location']}")
-        print(f"  Risk Score: {data['risk_score']}")
-        print(f"  Action: {data['action']}")
-        
-        
-        print("-" * 40)
-        print()
