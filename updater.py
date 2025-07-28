@@ -96,20 +96,7 @@ def get_geolocation_by_request(ip, cache, prefix):
 def get_prefix(ip, parts=2):
     return '.'.join(ip.split('.')[:parts])
 
-# This function saves a warning messages to a dictionary.
-# It takes a warnings dictionary, a warning message, an IP address, and an optional line number.
-# If the IP address is not already in the warnings dictionary, it initializes a new entry
-# with an empty list for messages and line numbers.
-# It appends the warning message to the list of messages and the line number to the list
-# of line numbers for that IP address.
-# This function is used to keep track of warnings for each IP address.
-def update_warning(warnings_dict, warning_message, ip, line_number=None):
-    if ip not in warnings_dict:
-        warnings_dict[ip] = {"messages": [], "line_numbers": []}
-    
-    warnings_dict[ip]["messages"].append(warning_message)
-    if line_number is not None:
-        warnings_dict[ip]["line_numbers"].append(line_number)
+
     
 
 # ******************************************************

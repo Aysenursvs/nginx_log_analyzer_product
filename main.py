@@ -1,7 +1,7 @@
 from reader import read_static_log_file, follow_log_file, load_ip_location_cache, load_prefix_counter
 from saver import save_ip_data_to_file,save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter,save_warning_to_file
 from parser import parse_log_line
-from updater import update_ip_record,update_ip_status, update_warning
+from updater import update_ip_record,update_ip_status
 from actions import give_warning
 from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path
 import logging
@@ -23,7 +23,7 @@ logging.basicConfig(
 # Initialize DATA STRUCTURES
 ip_datas = {}   # Dictionary to hold IP data. IP addresses are keys and their data are values.
 bad_lines = {}  # Dictionary to hold bad lines (lines that could not be parsed)
-warnings = {}  # Dictionary to hold warnings (IP addresses as key and warning message as value)
+
 
 # Load IP location cache
 ip_location_cache = load_ip_location_cache(ip_location_cache_file_path)
@@ -55,8 +55,7 @@ def run(log_lines,ip_location_cache, ip_datas, bad_lines):
 
         # Give warning based on the action of the IP data
         warning = give_warning(ip_data, ip=parsed_line.get('ip'))
-        update_warning(warnings, warning, parsed_line.get('ip'), line_number)
-        save_warning_to_file(warnings, warnings_file_path)
+        save_warning_to_file(warning, line_number, warnings_file_path)
 
         
 

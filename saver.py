@@ -85,5 +85,8 @@ def save_prefix_counter(counter, file_path="prefix_counter.json"):
 # If the warning message is empty, the function returns early.
 # The warning is appended to the file with the format "[Line X] warning message".
 # If there's an error during the file operation, it logs the error.
-def save_warning_to_file(warning_dict, file_path="warnings.json"):
-    write_json(warning_dict, file_path)
+def save_warning_to_file(warning, line_number, file_path="warnings.txt"):
+    if not warning:
+        return
+    with open(file_path, "a") as f:
+        f.write(f"[Line {line_number}]: {warning}\n")

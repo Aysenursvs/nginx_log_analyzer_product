@@ -14,7 +14,7 @@ prefix_counter_file_path = '/home/aysenur/projects/nginx_analyzer/prefix_counter
 #bad_lines_file_path is used to save bad log lines.
 bad_lines_file_path = '/home/aysenur/projects/nginx_analyzer/bad_lines.json'
 #warnings_file_path is used to save warnings.
-warnings_file_path = '/home/aysenur/projects/nginx_analyzer/warnings.json'
+warnings_file_path = '/home/aysenur/projects/nginx_analyzer/warnings.txt'
 
 #save_ip_data_to_file function saves ip data to this file
 log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_datas_real_dynamic_location.json'
