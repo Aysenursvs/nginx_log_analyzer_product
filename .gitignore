@@ -20,6 +20,4 @@ venv/
 # json files
 *.json
 
-# ignored files
-location.py
-*.txt
+
