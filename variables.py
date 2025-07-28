@@ -6,16 +6,22 @@
 source_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx.vhost.access.log'
 target_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx-access-example.log'
 
-source_file_path_example = '/home/aysenur/projects/nginx_analyzer/nginx-source-log.log'
-target_file_path_example = '/home/aysenur/projects/nginx_analyzer/nginx-target-log.log'
 
 #load_ip_location_cache function loads IP location data from this file if it exists.
 ip_location_cache_file_path = '/home/aysenur/projects/nginx_analyzer/ip_location_cache_prefix.json'
 #load_prefix_counter function loads prefix counter data from this file if it exists.
 prefix_counter_file_path = '/home/aysenur/projects/nginx_analyzer/prefix_counter.json'
+#bad_lines_file_path is used to save bad log lines.
+bad_lines_file_path = '/home/aysenur/projects/nginx_analyzer/bad_lines.json'
+#warnings_file_path is used to save warnings.
+warnings_file_path = '/home/aysenur/projects/nginx_analyzer/warnings.json'
 
 #save_ip_data_to_file function saves ip data to this file
 log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_datas_real_dynamic_location.json'
+
+
+
+
 
 ## updater.py ##
 

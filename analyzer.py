@@ -113,7 +113,7 @@ def calculate_rate_limit_risk(ip_data) -> int:
 # It returns a risk score of 10 if the prefix count is greater than the threshold and the request count is not equal to the prefix count.
 # If request count is equal to prefix count, it means there is one IP address that have this prefix. 
 # This is not suspicious.
-# The prefix threshold is set to 500 by default.
+# The prefix threshold is set to 300 by default.
 # The high risk score is set to 10 by default.
 # You can change the prefix threshold and the risk score here.
 def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300):
