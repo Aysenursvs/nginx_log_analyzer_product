@@ -100,10 +100,10 @@ def calculate_suspicious_risk_by_suspicious_flag(ip_data) -> int:
     return 0
 
 # This function calculates the rate limit risk score based on the rate limit exceeded flag.
-# It returns a risk score of 30 if the rate limit is exceeded, otherwise it returns 0.
+# It returns a risk score of 25 if the rate limit is exceeded, otherwise it returns 0.
 # The rate limit exceeded flag indicates if the IP has exceeded the rate limit based on the number of requests in the last `window_sec` seconds.
 # You can change the risk score for rate limit exceeded IPs here.
-# The default value is 30.
+# The default value is 25.
 def calculate_rate_limit_risk(ip_data) -> int:
     if ip_data["is_limit_exceeded"]:
         return 25
@@ -116,10 +116,10 @@ def calculate_rate_limit_risk(ip_data) -> int:
 # The prefix threshold is set to 500 by default.
 # The high risk score is set to 10 by default.
 # You can change the prefix threshold and the risk score here.
-def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300, high_risk_score=10):
+def calculate_prefix_risk(ip_data, prefix_counter, prefix_threshold=300):
     prefix_count = prefix_counter.get(ip_data.get("prefix"), None)
     if ip_data.get("request_count") != prefix_count and prefix_count  > prefix_threshold:
-        return high_risk_score
+        return 10
     return 0
 
 # This function calculates the location risk score based on the country and is_suspicious flag.
@@ -143,6 +143,13 @@ def calculate_location_risk(ip_data):
     # Suspicious countries list
     # You can change the suspicious countries here.
     suspicious_countries = ["RU", "CN", "KP", "IR", "NG", "BR", "VN"]
+    # RU = Russia
+    # CN = China
+    # KP = North Korea
+    # IR = Iran
+    # NG = Nigeria
+    # BR = Brazil
+    # VN = Vietnam
     # If country is in suspicious countries, return risk score
     if country in suspicious_countries:
         return 20

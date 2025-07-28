@@ -178,6 +178,8 @@ def print_record(ip_datas):
         print(f"    Bot: {data['risk_components']['bot']}")
         print(f"    Suspicious: {data['risk_components']['suspicious']}")
         print(f"    Rate Limit: {data['risk_components']['rate_limit']}")
+        print(f"    Prefix: {data['risk_components']['prefix']}")
+        print(f"    Location: {data['risk_components']['location']}")
         print(f"  Risk Score: {data['risk_score']}")
         print(f"  Action: {data['action']}")
         
