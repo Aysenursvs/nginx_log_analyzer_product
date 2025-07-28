@@ -1,31 +1,36 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 ## main.py ##
 #File paths:
 
 #Source files are static log files. that means new log lines are not added to them.
 #Target files are dynamic log files. that means new log lines are added to them.
-source_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx.vhost.access.log'
-target_file_path_real = '/home/aysenur/projects/nginx_analyzer/nginx-access-example.log'
+source_file_path_real = os.getenv("SOURCE_FILE_PATH_REAL")
+target_file_path_real = os.getenv("TARGET_FILE_PATH_REAL")
 
 
 #load_ip_location_cache function loads IP location data from this file if it exists.
-ip_location_cache_file_path = '/home/aysenur/projects/nginx_analyzer/ip_location_cache_prefix.json'
+ip_location_cache_file_path = os.getenv("IP_LOCATION_CACHE_FILE_PATH")
 #load_prefix_counter function loads prefix counter data from this file if it exists.
-prefix_counter_file_path = '/home/aysenur/projects/nginx_analyzer/prefix_counter.json'
+prefix_counter_file_path = os.getenv("PREFIX_COUNTER_FILE_PATH")
 #bad_lines_file_path is used to save bad log lines.
-bad_lines_file_path = '/home/aysenur/projects/nginx_analyzer/bad_lines.json'
+bad_lines_file_path = os.getenv("BAD_LINES_FILE_PATH")
 #warnings_file_path is used to save warnings.
-warnings_file_path = '/home/aysenur/projects/nginx_analyzer/warnings.txt'
-
+warnings_file_path = os.getenv("WARNINGS_FILE_PATH")
 #save_ip_data_to_file function saves ip data to this file
-log_results_file_path = '/home/aysenur/projects/nginx_analyzer/real_logs/ip_datas_real_dynamic_location.json'
+log_results_file_path = os.getenv("LOG_RESULTS_FILE_PATH")
 
 # This file is used to save the results of the analysis.
-logging_file_path = '/home/aysenur/projects/nginx_analyzer/lanalyzer.log'
+logging_file_path = os.getenv("LOGGING_FILE_PATH")
 
 
 ## updater.py ##
 
-API_KEY = "1110fe2e554f9d"
+API_KEY = os.getenv("IPINFO_API_KEY")
 
 # check_request_count function (in the analyzer.py but called in the updater.py) checks request count against this threshold.
 # default value is 10000 (in the function)
@@ -33,7 +38,7 @@ API_KEY = "1110fe2e554f9d"
 # If the request count is greater than or equal to this value, it is considered suspicious.
 # is_suspicious flag is set to True in the update_ip_status function (in the updater.py) if the request count is suspicious.
 # You can change this value here.
-request_count_threshold = 1000
+request_count_threshold = int(os.getenv("REQUEST_COUNT_THRESHOLD", 10000))
 
 # is_rate_limit_exceeded function (in the analyzer.py but called in the updater.py) checks rate limit against this threshold.
 # default value for window_sec is 60 (in the function)
@@ -42,8 +47,8 @@ request_count_threshold = 1000
 # If the number of requests in the last 60 seconds is greater than or equal to 100, it is considered rate limit exceeded.
 # is_limit_exceeded flag is set to True in the update_ip_status function (in the updater.py) if the rate limit is exceeded.
 # You can change this value here.
-rate_limit_window_sec = 60
-max_requests = 2400
+rate_limit_window_sec = int(os.getenv("RATE_LIMIT_WINDOW_SEC", 60))
+max_requests = int(os.getenv("MAX_REQUESTS", 2400))
 
 # update_action_by_risk_score function (in the updater.py) uses these risk scores to determine actions.
 # These values are used to determine if the IP should be blocked or reviewed.
@@ -52,9 +57,9 @@ max_requests = 2400
 # If the risk score is greater than or equal to review_risk_score, the action is set to "review",
 # then give_warning function prints a warning message and sets the review_warning flag to True.
 # You can change these values here.
- 
-block_risk_score = 70
-review_risk_score = 40
+
+block_risk_score = int(os.getenv("BLOCK_RISK_SCORE", 70))
+review_risk_score = int(os.getenv("REVIEW_RISK_SCORE", 40))
 
 ## analyzer.py ##
 # If you want to change the risk scores for bot, suspicious, rate limit, prefix, and location,

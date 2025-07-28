@@ -17,6 +17,19 @@ venv/
 .vscode/
 .idea/
 
+# JSON files
+*.json
+!ip_location_cache_prefix.json
+
+# TXT files
+*.txt
+!requirements.txt
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
 
 
 
