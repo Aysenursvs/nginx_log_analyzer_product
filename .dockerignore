@@ -43,3 +43,13 @@ LICENSE
 docs/
 tests/
 *.md
+
+# Log files
+*.log
+
+# JSON files
+*.json
+!ip_location_cache_prefix.json
+
+#TXT files
+*.txt
