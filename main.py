@@ -8,7 +8,7 @@ import logging
 
 
 # Configure logging: Sets up logging to write INFO level logs and above
-# to 'analyzer.log' file with timestamp, log level and message format
+# to 'nginx_analyzer_logging.log' file with timestamp, log level and message format
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
