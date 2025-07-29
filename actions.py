@@ -14,3 +14,6 @@ def give_warning(ip_data:dict, ip) -> str:
             warning = f"Block Warning: IP {ip} has action '{ip_data['action']}' with risk score {ip_data['risk_score']}."
             ip_data["block_warning"] = True
     return warning
+
+def give_notification():
+    pass
