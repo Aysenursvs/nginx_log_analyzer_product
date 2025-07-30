@@ -36,7 +36,12 @@ logging_file_path = os.getenv("LOGGING_FILE_PATH")
 # If you want to disable human interaction, set this variable to "false" in the .env file.
 human = os.getenv("HUMAN")
 
-## actions.py ##
+# This variable is used to determine if the log file is static or dynamic.
+# If you want to analyze a static log file, set this variable to "static" in the .env file.
+# If you want to follow a dynamic log file, set this variable to "dynamic" in the .env file.
+static_or_dynamic = os.getenv("STATIC_OR_DYNAMIC")
+
+## slack_app.py ##
 
 # This variable is used to send notifications to Slack.
 slack_channel = os.getenv("SLACK_CHANNEL")
