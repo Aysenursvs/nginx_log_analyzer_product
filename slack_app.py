@@ -4,13 +4,10 @@ import logging
 from variables import slack_channel, slack_channel_id, slack_token
 
 
-
-
-
+# This function sends a message to a specified Slack channel.
 def send_slack_message(message):
     try:
         client = WebClient(token=slack_token)
-        # Mesaj gönder
         client.chat_postMessage(
             channel=slack_channel,
             text=message,
@@ -20,6 +17,7 @@ def send_slack_message(message):
     except Exception as e:
         logging.error(f"Slack message error: {e}")
 
+# This function sends a file to a specified Slack channel.
 def send_slack_file(file_path):
     try:
         client = WebClient(token=slack_token)
@@ -28,7 +26,8 @@ def send_slack_file(file_path):
                 channel=slack_channel_id,
                 file=file_path,
                 title="Nginx Log Analysis Results",
-                filename=os.path.basename(file_path)
+                filename=os.path.basename(file_path),
+                username="Nginx Analyzer Bot"
             )
             logging.info(f"File uploaded successfully: {response['file']['name']}")
     except Exception as e:
