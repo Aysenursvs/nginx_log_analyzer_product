@@ -23,10 +23,9 @@ def send_slack_message(message):
 def send_slack_file(file_path):
     try:
         client = WebClient(token=slack_token)
-        # Dosya gönder
         if file_path and os.path.exists(file_path):
-            response = client.files_upload(
-                channels=slack_channel_id,
+            response = client.files_upload_v2(
+                channel=slack_channel_id,
                 file=file_path,
                 title="Nginx Log Analysis Results",
                 filename=os.path.basename(file_path)
