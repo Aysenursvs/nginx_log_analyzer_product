@@ -2,8 +2,8 @@ from reader import read_static_log_file, follow_log_file, load_ip_location_cache
 from saver import save_ip_data_to_file,save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter,save_warning_to_file
 from parser import parse_log_line
 from updater import update_ip_record,update_ip_status
-from actions import give_warning, give_notification, block_ip
-from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path, logging_file_path, human
+from actions import give_warning, handle_warning_notification
+from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path, logging_file_path, static_or_dynamic
 import logging
 
 
@@ -37,7 +37,7 @@ log_lines_dynamic = follow_log_file(target_file_path_real)  #follow dynamic log 
 
 # This function processes the log lines, updates IP records, calculates risk scores, and gives warnings based on the actions.
 # It saves the results to files periodically and prints the actions and risk scores.
-def run(log_lines,ip_location_cache, ip_datas, bad_lines):
+def run(log_lines,ip_location_cache, ip_datas, bad_lines, prefix_counter):
     for line_number, line in enumerate(log_lines, start=1):
 
         # Parse the log line
@@ -56,10 +56,9 @@ def run(log_lines,ip_location_cache, ip_datas, bad_lines):
         # Give warning based on the action of the IP data
         warning = give_warning(ip_data, ip=parsed_line.get('ip'))
         save_warning_to_file(warning, line_number, warnings_file_path)
-        if human and warning:
-            give_notification(warning, log_results_file_path)
-        else:
-            block_ip()
+
+        # Handle warning notification
+        handle_warning_notification(warning, ip_data, log_results_file_path, parsed_line.get('ip'))
 
         # Save results to files periodically
         if line_number % 1000 == 0:
@@ -73,12 +72,13 @@ def run(log_lines,ip_location_cache, ip_datas, bad_lines):
 # use "log_lines" variable and update the file path variable source_file_path_real in variables.py for static log file.
 # If you want to follow a dynamic log file;
 # use "log_lines_dynamic" variable and update the file path variable source_file_path_real in variables.py for dynamic log file.
-# And also update log_results_file_path in variables.py to save the results.
-# You can change all file paths in variables.py to your desired paths.
-
 
 if __name__ == "__main__":
-    run(log_lines_dynamic, ip_location_cache, ip_datas, bad_lines)
+
+    if static_or_dynamic == "static":
+        run(log_lines, ip_location_cache, ip_datas, bad_lines, prefix_counter)
+    elif static_or_dynamic == "dynamic":
+        run(log_lines_dynamic, ip_location_cache, ip_datas, bad_lines, prefix_counter)
 
 
 
