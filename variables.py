@@ -1,8 +1,12 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
+
+# Define the path to the .env file
+env_path = Path('.') / '.env'
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(env_path)
 
 ## main.py ##
 #File paths:
@@ -26,6 +30,18 @@ log_results_file_path = os.getenv("LOG_RESULTS_FILE_PATH")
 
 # This file is used to save the results of the analysis.
 logging_file_path = os.getenv("LOGGING_FILE_PATH")
+
+# This variable is used for human interaction.
+# If you want to enable human interaction, set this variable to "true" in the .env file.
+# If you want to disable human interaction, set this variable to "false" in the .env file.
+human = os.getenv("HUMAN")
+
+## actions.py ##
+
+# This variable is used to send notifications to Slack.
+slack_channel = os.getenv("SLACK_CHANNEL")
+slack_channel_id = os.getenv("SLACK_CHANNEL_ID")
+slack_token = os.getenv("SLACK_TOKEN")
 
 
 ## updater.py ##

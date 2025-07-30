@@ -1,3 +1,5 @@
+from slack_app import send_slack_message, send_slack_file
+from variables import slack_channel, slack_channel_id, slack_token
 #This file contains functions to analyze IP data and determine actions based on risk scores.
 
 #This function gives warnings based on the action of the IP data.
@@ -15,5 +17,9 @@ def give_warning(ip_data:dict, ip) -> str:
             ip_data["block_warning"] = True
     return warning
 
-def give_notification():
+def give_notification(warning_message, file_path):
+    send_slack_message(warning_message, slack_channel, slack_token)
+    send_slack_file(file_path, slack_channel_id, slack_token)
+
+def block_ip():
     pass

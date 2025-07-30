@@ -2,8 +2,8 @@ from reader import read_static_log_file, follow_log_file, load_ip_location_cache
 from saver import save_ip_data_to_file,save_bad_lines_to_file, save_ip_location_cache, save_prefix_counter,save_warning_to_file
 from parser import parse_log_line
 from updater import update_ip_record,update_ip_status
-from actions import give_warning
-from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path, logging_file_path
+from actions import give_warning, give_notification, block_ip
+from variables import source_file_path_real, target_file_path_real, ip_location_cache_file_path, prefix_counter_file_path, log_results_file_path, bad_lines_file_path, warnings_file_path, logging_file_path, human
 import logging
 
 
@@ -56,8 +56,10 @@ def run(log_lines,ip_location_cache, ip_datas, bad_lines):
         # Give warning based on the action of the IP data
         warning = give_warning(ip_data, ip=parsed_line.get('ip'))
         save_warning_to_file(warning, line_number, warnings_file_path)
-
-        
+        if human and warning:
+            give_notification(warning, log_results_file_path)
+        else:
+            block_ip()
 
         # Save results to files periodically
         if line_number % 1000 == 0:
