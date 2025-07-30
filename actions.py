@@ -52,9 +52,9 @@ def format_ip_info(ip_data: dict, ip_address: str) -> str:
 
 ⚠️ **Risk Analysis:**
    • Risk Score: {ip_data.get('risk_score', 0)}
-        - Bot Risk: {ip_data.get('bot_risk', 0)}
-        - Suspicious Risk: {ip_data.get('suspicious_risk', 0)}
-        - Rate Limit Risk: {ip_data.get('risk_components', {}).get('rate_limit', 0)}
+        - Bot Risk: {ip_data.get('risk_components', {}).get('bot', 0)}
+        - Suspicious Risk: {ip_data.get('risk_components', {}).get('suspicious', 0)}
+        - Rate Limit Risk: {ip_data.get('risk_components', {}).get('rate_limit')}
         - Prefix Risk: {ip_data.get('risk_components', {}).get('prefix', 0)}
         - Location Risk: {ip_data.get('risk_components', {}).get('location', 0)}
    • Action: {ip_data.get('action', 'normal').upper()}
